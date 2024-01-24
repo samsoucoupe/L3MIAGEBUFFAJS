@@ -195,6 +195,7 @@ export default class Grille {
     }
 
     removeCookies() {
+        let score = document.querySelector("#scoreValeur");
         for (let l = 0; l < this.l; l++) {
             for (let c = 0; c < this.c; c++) {
                 let cookie = this.tabcookies[l][c];
@@ -202,6 +203,8 @@ export default class Grille {
                     if (cookie.htmlImage.classList.contains("cookies-aligne")) {
                         cookie.htmlImage.remove();
                         this.tabcookies[l][c] = null;
+                        score.innerHTML++;
+
                     }
                 }
             }
