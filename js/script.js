@@ -12,8 +12,8 @@ function init() {
   console.log("Page et ressources prêtes à l'emploi");
   // appelée quand la page et ses ressources sont prêtes.
   // On dit aussi que le DOM est ready (en fait un peu plus...)
-
-  grille = new Grille(9, 9);
+  let nombre_lignes = 9;
+  grille = new Grille(nombre_lignes, nombre_lignes);
   grille.removeAlignement();
   grille.showCookies();
   let score = document.querySelector("#scoreValeur");
@@ -28,6 +28,18 @@ function init() {
     if (tempsRestant.innerHTML == 0) {
       alert("Fin de partie");
       clearInterval(interval);
+    //   mettre le score en gros devant la grille et faire que la grille ne soit plus cliquable
+
+    let score = document.querySelector("#scoreValeur");
+    score.style.fontSize = "xx-large";
+
+    let grille = document.querySelector("#grille");
+
+    grille.style.opacity = "0.5";
+    grille.style.pointerEvents = "none";
+
+
+
     }
   }
     let interval = setInterval(decompte, 1000);
