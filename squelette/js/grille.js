@@ -38,6 +38,7 @@ export default class Grille {
             let img = cookie.htmlImage;
 
             img.onclick = (event) => {
+
                 console.log("On a cliqué sur la ligne " + ligne + " et la colonne " + colonne);
                 //let cookieCliquee = this.getCookieFromLC(ligne, colonne);
                 console.log("Le cookie cliqué est de type " + cookie.type);
@@ -103,9 +104,7 @@ export default class Grille {
      * On verra plus tard pour les améliorations...
      */
     remplirTableauDeCookies(nbDeCookiesDifferents) {
-        // A FAIRE
         let tab = create2DArray(9);
-
         // remplir
         for (let l = 0; l < this.l; l++) {
             for (let c = 0; c < this.c; c++) {
@@ -141,12 +140,6 @@ export default class Grille {
         return alignement;
     }
 
-    testAlignementVerticalAll() {
-        for (let c = 0; c < this.c; c++) {
-            this.testAlignementVertical(c);
-        }
-    }
-
     testAlignementHorizontal(ligne) {
         let alignement = false;
 
@@ -172,16 +165,33 @@ export default class Grille {
         return alignement;
     }
 
-    testAlignementHorizontalAll() {
-        for (let l = 0; l < this.l; l++) {
-            this.testAlignementHorizontal(l);
+    testAlignementVerticalAll() {
+        let alignement = false;
+        for (let c = 0; c < this.c; c++) {
+            console.log("test alignement vertical pour la colonne " + c);
+            alignement = alignement || this.testAlignementVertical(c);
+            console.log(this.testAlignementVertical(c))
         }
+        return alignement;
+
+    }
+
+    testAlignementHorizontalAll() {
+        let alignement = false;
+        for (let l = 0; l < this.l; l++) {
+            console.log("test alignement horizontal pour la ligne " + l);
+            alignement = alignement || this.testAlignementHorizontal(l);
+            console.log(this.testAlignementHorizontal(l))
+        }
+        return alignement;
     }
 
     testAlignementAll() {
-        this.testAlignementHorizontalAll();
-        this.testAlignementVerticalAll();
-
+        let alignementhorizontal = false;
+        let alignementvertical = false;
+        alignementhorizontal = this.testAlignementHorizontalAll();
+        alignementvertical = this.testAlignementVerticalAll();
+        return (alignementhorizontal || alignementvertical);
     }
 
     removeCookies() {
@@ -256,14 +266,13 @@ export default class Grille {
 
     removeAlignement() {
 
-        let initTabCookies = create2DArray(this.l);
-        while (this.tabcookies !== initTabCookies) {
-            initTabCookies = this.tabcookies;
-            this.testAlignementAll();
+        while (this.testAlignementAll()) {
             this.removeCookies();
             this.putGravity();
             this.refill();
         }
+        console.log("sorti de la boucle")
+        this.showCookies();
 
     }
 

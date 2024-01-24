@@ -12,8 +12,15 @@ function init() {
   console.log("Page et ressources prêtes à l'emploi");
   // appelée quand la page et ses ressources sont prêtes.
   // On dit aussi que le DOM est ready (en fait un peu plus...)
+  let btn = document.querySelector("#btnStart");
+    btn.onclick = () => {
+      console.log("On a cliqué sur le bouton");
+      grille.removeAlignement();
+    }
+
 
   grille = new Grille(9, 9);
+  grille.removeAlignement();
   grille.showCookies();
 
 
