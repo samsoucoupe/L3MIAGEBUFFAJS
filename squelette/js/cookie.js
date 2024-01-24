@@ -1,82 +1,95 @@
 export default class Cookie {
-  ligne = 0;
-  colonne = 0;
-  type = 0;
-  canvas = document.createElement("canvas"); // Utilisation de canvas au lieu de htmlImage
-  static assets;
+  ligne=0;
+  colone=0;
+  type=0;
+  htmlImage=undefined;
+
+  static urlsImagesNormales = [
+    "./assets/images/Croissant@2x.png",
+    "./assets/images/Cupcake@2x.png",
+    "./assets/images/Danish@2x.png",
+    "./assets/images/Donut@2x.png",
+    "./assets/images/Macaroon@2x.png",
+    "./assets/images/SugarCookie@2x.png",
+  ];
+  static urlsImagesSurlignees = [
+    "./assets/images/Croissant-Highlighted@2x.png",
+    "./assets/images/Cupcake-Highlighted@2x.png",
+    "./assets/images/Danish-Highlighted@2x.png",
+    "./assets/images/Donut-Highlighted@2x.png",
+    "./assets/images/Macaroon-Highlighted@2x.png",
+    "./assets/images/SugarCookie-Highlighted@2x.png",
+  ];
 
   constructor(type, ligne, colonne) {
     this.type = type;
     this.ligne = ligne;
     this.colonne = colonne;
 
-    this.canvas.width = 80;
-    this.canvas.height = 80;
-    this.canvas.dataset.ligne = ligne;
-    this.canvas.dataset.colonne = colonne;
-
     const url = Cookie.urlsImagesNormales[type];
 
-    const image = new Image();
-    image.src = url;
-    image.onload = () => {
-      this.draw(this.canvas.getContext("2d"), 0, 0, 80, 80);
-    };
-  }
+    // On crée une image avec le DOM
+    let img = document.createElement("img");
+    img.src = url;
+    img.width = 80;
+    img.height = 80;
+    // pour pouvoir récupérer la ligne et la colonne
+    // quand on cliquera sur une image et donc à partir
+    // de cette ligne et colonne on pourra récupérer le cookie
+    img.dataset.ligne = ligne;
+    img.dataset.colonne = colonne;
 
-  draw(ctx, x, y, width, height) {
-    ctx.clearRect(x, y, width, height); // Efface le contenu précédent du canvas
+    this.htmlImage = img;
 
-    // Dessine l'image sur le canvas
-    ctx.drawImage(Cookie.assets[this.type], x, y, width, height);
+
+    // A FAIRE
   }
 
   selectionnee() {
-    // On change le dessin du canvas
-    const ctx = this.canvas.getContext("2d");
-    ctx.clearRect(0, 0, 80, 80);
-    ctx.drawImage(Cookie.assets[this.type + "_highlighted"], 0, 0, 80, 80);
+    // on change l'image et la classe CSS
+    this.htmlImage.src = Cookie.urlsImagesSurlignees[this.type];
+    // on zoome et on ajoute une ombre
+    this.htmlImage.classList.add("cookies-selected");
 
-    // On ajoute une classe CSS (peut être personnalisée pour le canvas)
-    this.canvas.classList.add("cookies-selected");
   }
 
   deselectionnee() {
-    // On change le dessin du canvas
-    const ctx = this.canvas.getContext("2d");
-    ctx.clearRect(0, 0, 80, 80);
-    ctx.drawImage(Cookie.assets[this.type], 0, 0, 80, 80);
-
-    // On enlève la classe CSS
-    this.canvas.classList.remove("cookies-selected");
+    // on change l'image et la classe CSS
+    this.htmlImage.src = Cookie.urlsImagesNormales[this.type];
+    // on dézoome et on enlève l'ombre
+    this.htmlImage.classList.remove("cookies-selected");
   }
 
   togglesSelection() {
-    if (this.canvas.classList.contains("cookies-selected")) {
+    if (this.htmlImage.classList.contains("cookies-selected")) {
       this.deselectionnee();
-    } else {
+    }
+    else {
       this.selectionnee();
     }
   }
 
   static swapCookies(c1, c2) {
     console.log("SWAP C1 C2");
-    // On échange leurs types
-    const typeTemp = c2.type;
-    c2.type = c1.type;
-    c1.type = typeTemp;
+    // On échange leurs images et types.
+    if (Cookie.distance(c1, c2) <2) {
+      // On échange leurs images et types
+      const imageTemp = c2.htmlImage.src;
+      const typeTemp = c2.type;
 
-    // On redessine les cookies
-    c1.draw(c1.canvas.getContext("2d"), 0, 0, 80, 80);
-    c2.draw(c2.canvas.getContext("2d"), 0, 0, 80, 80);
+      c2.htmlImage.src = c1.htmlImage.src;
+      c2.type = c1.type;
 
+      c1.htmlImage.src = imageTemp;
+      c1.type = typeTemp;
+    }
     // et on les désélectionne
     c1.deselectionnee();
     c2.deselectionnee();
   }
 
-  aligne() {
-    this.canvas.classList.add("cookies-aligne");
+  aligne(){
+    this.htmlImage.classList.add("cookies-aligne");
   }
 
   /** renvoie la distance entre deux cookies */
@@ -90,4 +103,5 @@ export default class Cookie {
     console.log("Distance = " + distance);
     return distance;
   }
+
 }
