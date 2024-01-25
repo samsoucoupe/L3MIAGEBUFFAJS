@@ -87,9 +87,7 @@ export default class Cookie {
     c2.deselectionnee();
   }
 
-  aligne(){
-    this.htmlImage.classList.add("cookies-aligne");
-  }
+
 
   /** renvoie la distance entre deux cookies */
   static distance(cookie1, cookie2) {
