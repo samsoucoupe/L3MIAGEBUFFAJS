@@ -14,11 +14,13 @@ function init() {
     // On dit aussi que le CandyCrushDOM est ready (en fait un peu plus...)
     let nombre_lignes = 9;
     grille = new Grille(nombre_lignes, nombre_lignes);
-    grille.removeCookies();
+    while (grille.getAllCookiesAlignes().length > 0) {
+        grille.removeCookies();
+    }
     console.log("apres removeCookies");
     let btn = document.querySelector("#boutonaligner");
     btn.onclick = () => {
-      grille.getAllCookiesAlignes(true);
+        grille.checkIfPossibleToPlay();
     }
 
 
