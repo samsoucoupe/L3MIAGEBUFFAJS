@@ -70,7 +70,6 @@ export default class Cookie {
   }
 
   static swapCookies(c1, c2) {
-    console.log("SWAP C1 C2");
     // On échange leurs images et types.
     if (Cookie.distance(c1, c2) <2) {
       // On échange leurs images et types
@@ -100,7 +99,6 @@ export default class Cookie {
     let c2 = cookie2.colonne;
 
     const distance = Math.abs(l1 - l2) + Math.abs(c1 - c2);
-    console.log("Distance = " + distance);
     return distance;
   }
 

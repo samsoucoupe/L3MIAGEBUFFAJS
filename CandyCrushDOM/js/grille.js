@@ -222,7 +222,6 @@ export default class Grille {
             if (this.tabcookies[ligne + 1][colonne] === null) {
                 this.tabcookies[ligne + 1][colonne] = this.tabcookies[ligne][colonne]
                 this.tabcookies[ligne][colonne] = null;
-                console.log("GetCookieUp " + "SWAP de " + ligne + " " + colonne + " avec " + (ligne + 1) + " " + colonne);
             }
         }
 
@@ -274,7 +273,6 @@ export default class Grille {
             this.putGravity();
             this.refill();
         }
-        console.log("sorti de la boucle")
         this.showCookies();
 
     }
