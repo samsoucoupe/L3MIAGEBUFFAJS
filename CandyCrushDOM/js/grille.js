@@ -58,12 +58,28 @@ export default class Grille {
                     } else {
                         cookie.togglesSelection();
                         this.cookiesSelectionnees.push(cookie);
-                        Cookie.swapCookies(this.cookiesSelectionnees[0], this.cookiesSelectionnees[1]);
+
+                        let swapPossible = this.checkIfSwapMakesAlignement(this.cookiesSelectionnees[0], this.cookiesSelectionnees[1]);
+
+                        if (!swapPossible) {
+                            soundManager.loadSound(assetsToLoadURLs.swapSound.url).then((buffer) => {
+                                soundManager.playSound(buffer);
+                            })
+
+                            this.cookiesSelectionnees = [];
+                            return;
+                        } else {
+                            Cookie.swapCookies(this.cookiesSelectionnees[0], this.cookiesSelectionnees[1]);
+                        }
+
+
+                        this.cookiesSelectionnees = [];
                         soundManager.loadSound(assetsToLoadURLs.swapSound.url).then((buffer) => {
                             soundManager.playSound(buffer);
                         })
                         this.cookiesSelectionnees = [];
                         this.removeCookies();
+                        // }
                     }
                 }
 
@@ -131,6 +147,10 @@ export default class Grille {
         return tab;
     }
 
+    getUniqueTab(tab){
+        return tab.filter((cookie, index, self) => self.indexOf(cookie) === index);
+    }
+
 
     getCookiesAlignes(cookie, verbose = false) {
         const ligne = cookie.ligne;
@@ -189,12 +209,12 @@ export default class Grille {
         analyzeDirection(0, 1, 'à droite',verbose);
 
         // Enlever les doublons
-        const uniqueCookiesAlignes = cookiesAlignes.filter(
-            (cookie, index, self) => self.indexOf(cookie) === index
-        );
+        const uniqueCookiesAlignes = this.getUniqueTab(cookiesAlignes);
 
         return uniqueCookiesAlignes;
     }
+
+
 
     getAllCookiesAlignes(verbose = false) {
         let cookiesAlignes = [];
@@ -234,26 +254,35 @@ export default class Grille {
         score.innerHTML = newScore;
     }
 
+
+
     removeCookies() {
 
         for (let l = 0; l < this.l; l++) {
             for (let c = 0; c < this.c; c++) {
 
                 let cookieAnalyse = this.tabcookies[l][c];
+
                 if (cookieAnalyse === null) {
                     continue;
                 }
                 let cookiesAlignes = this.getCookiesAlignes(cookieAnalyse);
                 let nombre_element_aligne = cookiesAlignes.length;
                 if (nombre_element_aligne >= 3) {
-                    cookiesAlignes.forEach((cookie) => {
+                    let toutCookiesAlignes = [...cookiesAlignes];
+                    for (let i = 0; i < nombre_element_aligne; i++) {
+                        let cookie = cookiesAlignes[i];
+                        toutCookiesAlignes.push(...this.getCookiesAlignes(cookie));
+                    }
+                    toutCookiesAlignes = this.getUniqueTab(toutCookiesAlignes);
+                    toutCookiesAlignes.forEach((cookie) => {
                         cookie.htmlImage.remove();
                         this.tabcookies[cookie.ligne][cookie.colonne] = null;
+                        this.attribuerScore(toutCookiesAlignes.length);
                     });
                     this.putGravity();
                     this.refill();
                     this.showCookies();
-                    this.attribuerScore(nombre_element_aligne);
                 }
             }
         }
@@ -316,6 +345,58 @@ export default class Grille {
             }
         }
     }
+
+
+    checkIfSwapMakesAlignement(cookie1, cookie2) {
+        let cookiesAlignes = [];
+        Cookie.swapCookies(cookie1, cookie2);
+        cookiesAlignes.push(...this.getCookiesAlignes(cookie1));
+        cookiesAlignes.push(...this.getCookiesAlignes(cookie2));
+        Cookie.swapCookies(cookie1, cookie2);
+        let alignement = cookiesAlignes.length >= 3;
+        console.log("checkIfSwapMakesAlignement pour " + cookie1 + " et " + cookie2 + " : " + alignement);
+        return alignement;
+    }
+
+    checkIfPossibleToPlay() {
+        let listeCookieAlignmentPossible = [];
+        //     on parcourt le tableau de cookies et on regarde si on peut aligner 3 cookies ou plus avec un swap sinon on dois refresh la grille
+        for (let l = 0; l < this.l; l++) {
+            for (let c = 0; c < this.c; c++) {
+                let cookieAnalyse = this.tabcookies[l][c];
+                if (cookieAnalyse === null) {
+                    continue;
+                }
+                if (l + 1 < this.l) {
+                    let cookieDown = this.tabcookies[l + 1][c];
+                    if (this.checkIfSwapMakesAlignement(cookieAnalyse, cookieDown)) {
+                        listeCookieAlignmentPossible.push(cookieAnalyse);
+                    }
+                }
+                if (l - 1 >= 0) {
+                    let cookieUp = this.tabcookies[l - 1][c];
+                    if (this.checkIfSwapMakesAlignement(cookieAnalyse, cookieUp)) {
+                        listeCookieAlignmentPossible.push(cookieAnalyse);
+                    }
+                }
+                if (c + 1 < this.c) {
+                    let cookieRight = this.tabcookies[l][c + 1];
+                    if (this.checkIfSwapMakesAlignement(cookieAnalyse, cookieRight)) {
+                        listeCookieAlignmentPossible.push(cookieAnalyse);
+                    }
+                }
+                if (c - 1 >= 0) {
+                    let cookieLeft = this.tabcookies[l][c - 1];
+                    if (this.checkIfSwapMakesAlignement(cookieAnalyse, cookieLeft)) {
+                        listeCookieAlignmentPossible.push(cookieAnalyse);
+                    }
+                }
+            }
+
+        }
+        console.log(listeCookieAlignmentPossible);
+    }
+
 
 
 }
