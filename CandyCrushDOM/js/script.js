@@ -38,8 +38,6 @@ function init() {
     grille.style.opacity = "0.5";
     grille.style.pointerEvents = "none";
 
-
-
     }
   }
     let interval = setInterval(decompte, 1000);

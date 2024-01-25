@@ -1,5 +1,7 @@
 import Cookie from "./cookie.js";
 import {create2DArray} from "./utils.js";
+import Sound from "./sound.js";
+import { assetsToLoadURLs } from "./assets.js";
 
 /* Classe principale du jeu, c'est une grille de cookies. Le jeu se joue comme
 Candy Crush Saga etc... c'est un match-3 game... */
@@ -10,7 +12,6 @@ export default class Grille {
     constructor(l, c) {
         this.c = c;
         this.l = l;
-
         this.tabcookies = this.remplirTableauDeCookies(6)
     }
 
@@ -21,6 +22,7 @@ export default class Grille {
      * et implémenter la logique du jeu.
      */
     showCookies() {
+        let soundManager = new Sound();
         let caseDivs = document.querySelectorAll("#grille div");
 
         caseDivs.forEach((div, index) => {
@@ -54,6 +56,9 @@ export default class Grille {
                         cookie.togglesSelection();
                         this.cookiesSelectionnees.push(cookie);
                         Cookie.swapCookies(this.cookiesSelectionnees[0], this.cookiesSelectionnees[1]);
+                        soundManager.loadSound(assetsToLoadURLs.swapSound.url).then((buffer) => {
+                            soundManager.playSound(buffer);
+                        })
                         this.cookiesSelectionnees = [];
                         this.removeAlignement();
                     }
@@ -209,6 +214,10 @@ export default class Grille {
                 }
             }
         }
+        let soundManager = new Sound();
+        soundManager.loadSound(assetsToLoadURLs.destroySound.url).then((buffer) => {
+            soundManager.playSound(buffer);
+        })
     }
 
     getCookieUp(ligne, colonne) {

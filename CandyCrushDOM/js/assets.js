@@ -1,4 +1,4 @@
-export { loadAssets };
+export { loadAssets, assetsToLoadURLs };
 
 /* Les assets, on pourra plus tard ajouter des sons et des musiques */
 const assetsToLoadURLs = {
@@ -13,10 +13,11 @@ const assetsToLoadURLs = {
   macaroon: { url: "assets/images/Macaroon@2x.png" },
   macaroonHighlighted: { url: "assets/images/Macaroon-Highlighted@2x.png" },
   sugarCookie: { url: "assets/images/SugarCookie@2x.png" },
-  sugarCookieHighlighted: {
-    url: "assets/images/SugarCookie-Highlighted@2x.png",
-  },
+  sugarCookieHighlighted: { url: "assets/images/SugarCookie-Highlighted@2x.png",},
   tileEmpty: { url: "assets/images/TileEmpty.png" },
+  swapSound: { url: "assets/sounds/SWSH_Whoosh 4 (ID 1796)_LS.wav", buffer: true, loop: false, volume: 1.0 },
+  errorSound: { url: "assets/sounds/TOYElec_Docteur maboul 4 (ID 1685)_LS", buffer: true, loop: false, volume: 1.0 },
+  destroySound: { url: "assets/sounds/353067__jofae__bite-cartoon-style.mp3", buffer: true, loop: false, volume: 1.0 },
 };
 
 function loadAssets(callback) {
