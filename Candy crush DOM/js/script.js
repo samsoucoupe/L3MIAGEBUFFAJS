@@ -11,7 +11,7 @@ let grille;
 function init() {
   console.log("Page et ressources prêtes à l'emploi");
   // appelée quand la page et ses ressources sont prêtes.
-  // On dit aussi que le DOM est ready (en fait un peu plus...)
+  // On dit aussi que le Candy crush DOM est ready (en fait un peu plus...)
   let nombre_lignes = 9;
   grille = new Grille(nombre_lignes, nombre_lignes);
   grille.removeAlignement();

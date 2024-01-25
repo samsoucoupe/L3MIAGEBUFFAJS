@@ -28,7 +28,7 @@ export default class Cookie {
 
     const url = Cookie.urlsImagesNormales[type];
 
-    // On crée une image avec le DOM
+    // On crée une image avec le Candy crush DOM
     let img = document.createElement("img");
     img.src = url;
     img.width = 80;
