@@ -150,8 +150,6 @@ export default class Grille {
             let ligneAnalyse = ligne;
             let colonneAnalyse = colonne;
             if (verbose) {
-                console.log(`Analyse des cookies ${direction} :`);
-                console.log(cookie);
                 console.log("ligneAnalyse : " + ligneAnalyse);
                 console.log("colonneAnalyse : " + colonneAnalyse);
                 console.log("ligne: " + ligne);
@@ -161,13 +159,17 @@ export default class Grille {
 
             let cookieAnalyse = this.tabcookies[ligneAnalyse][colonneAnalyse];
 
-            while (ligneAnalyse >= 1 && ligneAnalyse < this.l - 1 && colonneAnalyse >= 1 && colonneAnalyse < this.c - 1 && cookieAnalyse.type === typeCookie) {
+            while (ligneAnalyse >= 0 && ligneAnalyse < this.l  && colonneAnalyse >= 0 && colonneAnalyse < this.c && cookieAnalyse.type === typeCookie) {
                 cookiesAlignesTemp.push(cookieAnalyse);
                 ligneAnalyse += rowIncrement;
                 colonneAnalyse += colIncrement;
+                if(ligneAnalyse < 0 || ligneAnalyse >= this.l || colonneAnalyse < 0 || colonneAnalyse >= this.c){
+                    break;
+                }
                 cookieAnalyse = this.tabcookies[ligneAnalyse][colonneAnalyse];
                 nbCookiesAlignes++;
             }
+
 
             if (cookieAnalyse.type === typeCookie) {
                 cookiesAlignesTemp.push(cookieAnalyse);
