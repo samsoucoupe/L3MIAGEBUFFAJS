@@ -41,8 +41,6 @@ export default class Cookie {
 
     this.htmlImage = img;
 
-
-    // A FAIRE
   }
 
   selectionnee() {
@@ -81,10 +79,23 @@ export default class Cookie {
 
       c1.htmlImage.src = imageTemp;
       c1.type = typeTemp;
+    }else{
+      alert("Vous ne pouvez pas échanger ces deux cookies");
+      c1.immobile();
+      c2.immobile();
     }
     // et on les désélectionne
     c1.deselectionnee();
     c2.deselectionnee();
+    return Cookie.distance(c1, c2) <2;
+  }
+
+  immobile(){
+    this.htmlImage.classList.add("cookies-immobile");
+  }
+
+  deimmobile(){
+    this.htmlImage.classList.remove("cookies-immobile");
   }
 
 
@@ -98,6 +109,13 @@ export default class Cookie {
 
     const distance = Math.abs(l1 - l2) + Math.abs(c1 - c2);
     return distance;
+  }
+
+  addShiverState(){
+    this.htmlImage.classList.add("cookies-shiver");
+  }
+  removeShiverState(){
+    this.htmlImage.classList.remove("cookies-shiver");
   }
 
 }
