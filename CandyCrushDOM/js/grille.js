@@ -13,6 +13,7 @@ export default class Grille {
         this.c = c;
         this.l = l;
         this.tabcookies = this.remplirTableauDeCookies(6)
+        this.cookiesSwapables = [];
     }
 
     /**
@@ -102,8 +103,7 @@ export default class Grille {
             }
 
             img.ondrop = (event) => {
-                if (verbose)
-                {
+                if (verbose) {
                     console.log("On drop une image");
                     console.log(event.target);
                 }
@@ -147,7 +147,7 @@ export default class Grille {
         return tab;
     }
 
-    getUniqueTab(tab){
+    getUniqueTab(tab) {
         return tab.filter((cookie, index, self) => self.indexOf(cookie) === index);
     }
 
@@ -179,11 +179,11 @@ export default class Grille {
 
             let cookieAnalyse = this.tabcookies[ligneAnalyse][colonneAnalyse];
 
-            while (ligneAnalyse >= 0 && ligneAnalyse < this.l  && colonneAnalyse >= 0 && colonneAnalyse < this.c && cookieAnalyse.type === typeCookie) {
+            while (ligneAnalyse >= 0 && ligneAnalyse < this.l && colonneAnalyse >= 0 && colonneAnalyse < this.c && cookieAnalyse.type === typeCookie) {
                 cookiesAlignesTemp.push(cookieAnalyse);
                 ligneAnalyse += rowIncrement;
                 colonneAnalyse += colIncrement;
-                if(ligneAnalyse < 0 || ligneAnalyse >= this.l || colonneAnalyse < 0 || colonneAnalyse >= this.c){
+                if (ligneAnalyse < 0 || ligneAnalyse >= this.l || colonneAnalyse < 0 || colonneAnalyse >= this.c) {
                     break;
                 }
                 cookieAnalyse = this.tabcookies[ligneAnalyse][colonneAnalyse];
@@ -203,17 +203,16 @@ export default class Grille {
             checkAndPush(cookiesAlignesTemp, nbCookiesAlignes);
         };
 
-        analyzeDirection(-1, 0, 'en haut',verbose);
-        analyzeDirection(1, 0, 'en bas',verbose);
-        analyzeDirection(0, -1, 'à gauche',verbose);
-        analyzeDirection(0, 1, 'à droite',verbose);
+        analyzeDirection(-1, 0, 'en haut', verbose);
+        analyzeDirection(1, 0, 'en bas', verbose);
+        analyzeDirection(0, -1, 'à gauche', verbose);
+        analyzeDirection(0, 1, 'à droite', verbose);
 
         // Enlever les doublons
         const uniqueCookiesAlignes = this.getUniqueTab(cookiesAlignes);
 
         return uniqueCookiesAlignes;
     }
-
 
 
     getAllCookiesAlignes(verbose = false) {
@@ -253,7 +252,6 @@ export default class Grille {
         let newScore = parseInt(score.innerHTML) + this.scoreToGet(nombre_element_aligne);
         score.innerHTML = newScore;
     }
-
 
 
     removeCookies() {
@@ -359,7 +357,7 @@ export default class Grille {
     }
 
     checkIfPossibleToPlay() {
-        let listeCookieAlignmentPossible = [];
+
         //     on parcourt le tableau de cookies et on regarde si on peut aligner 3 cookies ou plus avec un swap sinon on dois refresh la grille
         for (let l = 0; l < this.l; l++) {
             for (let c = 0; c < this.c; c++) {
@@ -370,33 +368,51 @@ export default class Grille {
                 if (l + 1 < this.l) {
                     let cookieDown = this.tabcookies[l + 1][c];
                     if (this.checkIfSwapMakesAlignement(cookieAnalyse, cookieDown)) {
-                        listeCookieAlignmentPossible.push(cookieAnalyse);
+                        let tuple = [cookieAnalyse, cookieDown];
+                        this.cookiesSwapables.push(tuple);
                     }
                 }
                 if (l - 1 >= 0) {
                     let cookieUp = this.tabcookies[l - 1][c];
                     if (this.checkIfSwapMakesAlignement(cookieAnalyse, cookieUp)) {
-                        listeCookieAlignmentPossible.push(cookieAnalyse);
+                        let tuple = [cookieAnalyse, cookieUp];
+                        this.cookiesSwapables.push(tuple);
                     }
                 }
                 if (c + 1 < this.c) {
                     let cookieRight = this.tabcookies[l][c + 1];
                     if (this.checkIfSwapMakesAlignement(cookieAnalyse, cookieRight)) {
-                        listeCookieAlignmentPossible.push(cookieAnalyse);
+                        let tuple = [cookieAnalyse, cookieRight];
+                        this.cookiesSwapables.push(tuple);
                     }
                 }
                 if (c - 1 >= 0) {
                     let cookieLeft = this.tabcookies[l][c - 1];
                     if (this.checkIfSwapMakesAlignement(cookieAnalyse, cookieLeft)) {
-                        listeCookieAlignmentPossible.push(cookieAnalyse);
+                        let tuple = [cookieAnalyse, cookieLeft];
+                        this.cookiesSwapables.push(tuple);
                     }
                 }
             }
 
         }
-        console.log(listeCookieAlignmentPossible);
+        this.cookiesSwapables = this.getUniqueTab(this.cookiesSwapables);
+
+
+        return this.cookiesSwapables;
     }
 
+
+    showCookiesSwapables() {
+        let tupleAffiche = this.cookiesSwapables[Math.floor(Math.random() * this.cookiesSwapables.length)];
+        tupleAffiche.forEach((cookie) => {
+            cookie.addShiverState();
+            setTimeout(() => {
+                cookie.removeShiverState();
+            }, 1000)
+        })
+
+    }
 
 
 }
