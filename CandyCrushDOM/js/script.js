@@ -18,9 +18,10 @@ function init() {
         grille.removeCookies();
     }
     console.log("apres removeCookies");
+    grille.checkIfPossibleToPlay();
     let btn = document.querySelector("#boutonaligner");
     btn.onclick = () => {
-        grille.checkIfPossibleToPlay();
+      grille.checkIfPossibleToPlay();
     }
 
 
@@ -47,6 +48,18 @@ function init() {
 
             grille.style.opacity = "0.5";
             grille.style.pointerEvents = "none";
+
+        }else if(tempsRestant.innerHTML === 10){
+            tempsRestant.style.color = "red";
+        }
+        else if(tempsRestant.innerHTML === 20){
+            tempsRestant.style.color = "orange";
+        }
+        else if(tempsRestant.innerHTML === 30){
+            tempsRestant.style.color = "yellow";
+        }
+        if(tempsRestant.innerHTML % 5 ===0){
+          grille.showCookiesSwapables();
 
         }
     }
