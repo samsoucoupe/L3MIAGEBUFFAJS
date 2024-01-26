@@ -36,7 +36,7 @@ function init() {
 
     function decompte() {
         tempsRestant.innerHTML--;
-        if (tempsRestant.innerHTML === 0) {
+        if (tempsRestant.innerHTML <1) {
             alert("Fin de partie");
             clearInterval(interval);
             //   mettre le score en gros devant la grille et faire que la grille ne soit plus cliquable
