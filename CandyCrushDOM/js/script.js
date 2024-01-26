@@ -21,7 +21,7 @@ function init() {
     grille.checkIfPossibleToPlay();
     let btn = document.querySelector("#boutonaligner");
     btn.onclick = () => {
-      grille.checkIfPossibleToPlay();
+        grille.checkIfPossibleToPlay();
     }
 
 
@@ -36,7 +36,7 @@ function init() {
 
     function decompte() {
         tempsRestant.innerHTML--;
-        if (tempsRestant.innerHTML == 0) {
+        if (tempsRestant.innerHTML === 0) {
             alert("Fin de partie");
             clearInterval(interval);
             //   mettre le score en gros devant la grille et faire que la grille ne soit plus cliquable
@@ -49,19 +49,23 @@ function init() {
             grille.style.opacity = "0.5";
             grille.style.pointerEvents = "none";
 
-        }else if(tempsRestant.innerHTML === 10){
-            tempsRestant.style.color = "red";
         }
-        else if(tempsRestant.innerHTML === 20){
-            tempsRestant.style.color = "orange";
-        }
-        else if(tempsRestant.innerHTML === 30){
-            tempsRestant.style.color = "yellow";
-        }
-        if(tempsRestant.innerHTML % 5 ===0){
-          grille.showCookiesSwapables();
+
+        if (tempsRestant.innerHTML % 5 === 0) {
+            grille.showCookiesSwapables();
 
         }
+
+        if (tempsRestant.innerHTML <10) {
+            tempsRestant.style.color = "red";
+        }
+        else if (tempsRestant.innerHTML <20) {
+            tempsRestant.style.color = "orange";
+        }
+        else if (tempsRestant.innerHTML <30) {
+            tempsRestant.style.color = "yellow";
+        }
+
     }
 
     let interval = setInterval(decompte, 1000);
