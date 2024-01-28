@@ -100,7 +100,7 @@ export default class Grille {
 
 
             img.ondragover = (event) => {
-                return false;
+                event.preventDefault()
             }
 
             img.ondrop = (event) => {
