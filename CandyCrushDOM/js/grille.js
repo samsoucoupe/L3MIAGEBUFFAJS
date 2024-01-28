@@ -30,7 +30,7 @@ export default class Grille {
 
 
             // on récupère le cookie correspondant à cette case
-            let cookie = this.tabcookies[ligne][colonne];
+            let cookie = this.getCookieFromLC(ligne, colonne);
             if (cookie === null) {
                 div.innerHTML = "";
                 return;
@@ -222,12 +222,9 @@ export default class Grille {
                 cookiesAlignes.push(...this.getCookiesAlignes(cookieAnalyse, verbose));
             }
         }
-        // Enlever les doublons
-        cookiesAlignes = cookiesAlignes.filter(
-            (cookie, index, self) => self.indexOf(cookie) === index
-        );
 
-        return cookiesAlignes;
+
+        return this.getUniqueTab(cookiesAlignes)
     }
 
     GetAllCookiesAlignesOfOneCookie(cookie, verbose = false) {
@@ -236,6 +233,7 @@ export default class Grille {
         console.log("cookiesAlignes");
         console.log(cookiesAlignes);
         let AllCookiesAlignesOfOneCookie = [];
+        AllCookiesAlignesOfOneCookie.push(...cookiesAlignes)
         for (let i = 0; i < cookiesAlignes.length; i++) {
             AllCookiesAlignesOfOneCookie.push(...this.getCookiesAlignes(cookiesAlignes[i], verbose));
         }
@@ -312,12 +310,13 @@ export default class Grille {
         if (ligne === -1) {
             return null;
         }
-        if (this.tabcookies[ligne][colonne] === null) {
+
+        if (this.getCookieFromLC(ligne, colonne) === null) {
             this.getCookieUp(ligne - 1, colonne);
         }
         if (ligne + 1 < this.l) {
             if (this.tabcookies[ligne + 1][colonne] === null) {
-                this.tabcookies[ligne + 1][colonne] = this.tabcookies[ligne][colonne]
+                this.tabcookies[ligne + 1][colonne] = this.getCookieFromLC(ligne, colonne)
                 this.tabcookies[ligne][colonne] = null;
             }
         }
