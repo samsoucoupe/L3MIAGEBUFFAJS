@@ -16,12 +16,7 @@ export default class Grille {
         this.cookiesSwapables = [];
     }
 
-    /**
-     * parcours la liste des divs de la grille et affiche les images des cookies
-     * correspondant à chaque case. Au passage, à chaque image on va ajouter des
-     * écouteurs de click et de drag'n'drop pour pouvoir interagir avec elles
-     * et implémenter la logique du jeu.
-     */
+
     showCookies(verbose = false) {
         let soundManager = new Sound();
         let caseDivs = document.querySelectorAll("#grille div");
@@ -71,18 +66,24 @@ export default class Grille {
                             return;
                         } else {
                             Cookie.swapCookies(this.cookiesSelectionnees[0], this.cookiesSelectionnees[1]);
+                            console.log("cookiesSelectionnees[0]");
+                            console.log(this.GetAllCookiesAlignesOfOneCookie(this.cookiesSelectionnees[0]));
+                            console.log("cookiesSelectionnees[1]");
+                            console.log(this.GetAllCookiesAlignesOfOneCookie(this.cookiesSelectionnees[1]));
+
+
+                            this.cookiesSelectionnees = [];
+                            soundManager.loadSound(assetsToLoadURLs.swapSound.url).then((buffer) => {
+                                soundManager.playSound(buffer);
+                            })
+                            this.cookiesSelectionnees = [];
+
+
                         }
-
-
-                        this.cookiesSelectionnees = [];
-                        soundManager.loadSound(assetsToLoadURLs.swapSound.url).then((buffer) => {
-                            soundManager.playSound(buffer);
-                        })
-                        this.cookiesSelectionnees = [];
-                        this.removeCookies();
-                        // }
                     }
+                    this.removeCookies();
                 }
+
 
             }
             img.ondragstart = (event) => {
@@ -209,9 +210,7 @@ export default class Grille {
         analyzeDirection(0, 1, 'à droite', verbose);
 
         // Enlever les doublons
-        const uniqueCookiesAlignes = this.getUniqueTab(cookiesAlignes);
-
-        return uniqueCookiesAlignes;
+        return this.getUniqueTab(cookiesAlignes);
     }
 
 
@@ -229,6 +228,19 @@ export default class Grille {
         );
 
         return cookiesAlignes;
+    }
+
+    GetAllCookiesAlignesOfOneCookie(cookie, verbose = false) {
+        let cookiesAlignes = [];
+        cookiesAlignes.push(...this.getCookiesAlignes(cookie, verbose));
+        console.log("cookiesAlignes");
+        console.log(cookiesAlignes);
+        let AllCookiesAlignesOfOneCookie = [];
+        for (let i = 0; i < cookiesAlignes.length; i++) {
+            AllCookiesAlignesOfOneCookie.push(...this.getCookiesAlignes(cookiesAlignes[i], verbose));
+        }
+        AllCookiesAlignesOfOneCookie = this.getUniqueTab(AllCookiesAlignesOfOneCookie);
+        return AllCookiesAlignesOfOneCookie;
     }
 
 
@@ -249,8 +261,10 @@ export default class Grille {
 
     attribuerScore(nombre_element_aligne) {
         let score = document.querySelector("#scoreValeur");
+        let timer = document.querySelector("#tempsRestantValeur");
         let newScore = parseInt(score.innerHTML) + this.scoreToGet(nombre_element_aligne);
         score.innerHTML = newScore;
+        timer.innerHTML = parseInt(timer.innerHTML) + this.scoreToGet(nombre_element_aligne);
     }
 
 
@@ -288,6 +302,10 @@ export default class Grille {
         soundManager.loadSound(assetsToLoadURLs.destroySound.url).then((buffer) => {
             soundManager.playSound(buffer);
         })
+
+        if(this.getAllCookiesAlignes().length>0){
+            this.removeCookies();
+        }
     }
 
     getCookieUp(ligne, colonne) {
@@ -347,12 +365,11 @@ export default class Grille {
 
     checkIfSwapMakesAlignement(cookie1, cookie2) {
         let cookiesAlignes = [];
-        Cookie.swapCookies(cookie1, cookie2);
-        cookiesAlignes.push(...this.getCookiesAlignes(cookie1));
-        cookiesAlignes.push(...this.getCookiesAlignes(cookie2));
+        Cookie.swapCookies(cookie1, cookie2,true);
+        cookiesAlignes = this.getAllCookiesAlignes();
         Cookie.swapCookies(cookie1, cookie2);
         let alignement = cookiesAlignes.length >= 3;
-        console.log("checkIfSwapMakesAlignement pour " + cookie1 + " et " + cookie2 + " : " + alignement);
+        // console.log("checkIfSwapMakesAlignement pour " + cookie1 + " et " + cookie2 + " : " + alignement);
         return alignement;
     }
 
