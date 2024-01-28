@@ -28,11 +28,12 @@ function init() {
     grille.showCookies();
     let score = document.querySelector("#scoreValeur");
     score.innerHTML = 0;
+    let tempsRestant = document.querySelector("#tempsRestantValeur");
+    tempsRestant.innerHTML = 60;
 
 //   on decrement le temps de 1 seconde et on met a jour le temps dans la balise du html tempsRestantValeur
 //    on verifie si le temps est a 0 et si oui on affiche le message de fin de partie et on arrete le jeu
 
-    let tempsRestant = document.querySelector("#tempsRestantValeur");
 
     function decompte() {
         tempsRestant.innerHTML--;
