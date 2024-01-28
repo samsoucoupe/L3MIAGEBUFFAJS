@@ -67,7 +67,8 @@ export default class Cookie {
     }
   }
 
-  static swapCookies(c1, c2) {
+  static swapCookies(c1, c2,verbose=false) {
+
     // On échange leurs images et types.
     if (Cookie.distance(c1, c2) <2) {
       // On échange leurs images et types
@@ -80,9 +81,9 @@ export default class Cookie {
       c1.htmlImage.src = imageTemp;
       c1.type = typeTemp;
     }else{
-      alert("Vous ne pouvez pas échanger ces deux cookies");
-      c1.immobile();
-      c2.immobile();
+      if(verbose){
+        alert("Vous ne pouvez pas échanger ces deux cookies");
+      }
     }
     // et on les désélectionne
     c1.deselectionnee();
