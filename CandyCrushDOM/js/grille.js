@@ -1,7 +1,7 @@
 import Cookie from "./cookie.js";
 import {create2DArray} from "./utils.js";
 import Sound from "./sound.js";
-import { assetsToLoadURLs } from "./assets.js";
+import {assetsToLoadURLs} from "./assets.js";
 
 /* Classe principale du jeu, c'est une grille de cookies. Le jeu se joue comme
 Candy Crush Saga etc... c'est un match-3 game... */
@@ -13,26 +13,24 @@ export default class Grille {
         this.c = c;
         this.l = l;
         this.tabcookies = this.remplirTableauDeCookies(6)
+        this.cookiesSwapables = [];
     }
 
-    /**
-     * parcours la liste des divs de la grille et affiche les images des cookies
-     * correspondant à chaque case. Au passage, à chaque image on va ajouter des
-     * écouteurs de click et de drag'n'drop pour pouvoir interagir avec elles
-     * et implémenter la logique du jeu.
-     */
-    showCookies() {
+
+    showCookies(verbose = false) {
         let soundManager = new Sound();
         let caseDivs = document.querySelectorAll("#grille div");
 
         caseDivs.forEach((div, index) => {
             let ligne = Math.floor(index / this.l);
             let colonne = index % this.c;
+            if (verbose) {
+                console.log("On remplit le div index=" + index + " l=" + ligne + " col=" + colonne);
+            }
 
-            console.log("On remplit le div index=" + index + " l=" + ligne + " col=" + colonne);
 
             // on récupère le cookie correspondant à cette case
-            let cookie = this.tabcookies[ligne][colonne];
+            let cookie = this.getCookieFromLC(ligne, colonne);
             if (cookie === null) {
                 div.innerHTML = "";
                 return;
@@ -40,10 +38,11 @@ export default class Grille {
             let img = cookie.htmlImage;
 
             img.onclick = (event) => {
-
-                console.log("On a cliqué sur la ligne " + ligne + " et la colonne " + colonne);
-                //let cookieCliquee = this.getCookieFromLC(ligne, colonne);
-                console.log("Le cookie cliqué est de type " + cookie.type);
+                if (verbose) {
+                    console.log("On a cliqué sur la ligne " + ligne + " et la colonne " + colonne);
+                    //let cookieCliquee = this.getCookieFromLC(ligne, colonne);
+                    console.log("Le cookie cliqué est de type " + cookie.type);
+                }
                 // highlight + changer classe CSS
                 if (this.cookiesSelectionnees.length === 0) {
                     cookie.togglesSelection();
@@ -55,18 +54,42 @@ export default class Grille {
                     } else {
                         cookie.togglesSelection();
                         this.cookiesSelectionnees.push(cookie);
-                        Cookie.swapCookies(this.cookiesSelectionnees[0], this.cookiesSelectionnees[1]);
-                        soundManager.loadSound(assetsToLoadURLs.swapSound.url).then((buffer) => {
-                            soundManager.playSound(buffer);
-                        })
-                        this.cookiesSelectionnees = [];
-                        this.removeAlignement();
+
+                        let swapPossible = this.checkIfSwapMakesAlignement(this.cookiesSelectionnees[0], this.cookiesSelectionnees[1]);
+
+                        if (!swapPossible) {
+                            soundManager.loadSound(assetsToLoadURLs.swapSound.url).then((buffer) => {
+                                soundManager.playSound(buffer);
+                            })
+
+                            this.cookiesSelectionnees = [];
+                            return;
+                        } else {
+                            Cookie.swapCookies(this.cookiesSelectionnees[0], this.cookiesSelectionnees[1]);
+                            console.log("cookiesSelectionnees[0]");
+                            console.log(this.GetAllCookiesAlignesOfOneCookie(this.cookiesSelectionnees[0]));
+                            console.log("cookiesSelectionnees[1]");
+                            console.log(this.GetAllCookiesAlignesOfOneCookie(this.cookiesSelectionnees[1]));
+
+
+                            this.cookiesSelectionnees = [];
+                            soundManager.loadSound(assetsToLoadURLs.swapSound.url).then((buffer) => {
+                                soundManager.playSound(buffer);
+                            })
+                            this.cookiesSelectionnees = [];
+
+
+                        }
                     }
+                    this.removeCookies();
                 }
+
 
             }
             img.ondragstart = (event) => {
-                console.log("On commence à drag l'image");
+                if (verbose) {
+                    console.log("On commence à drag l'image");
+                }
                 if (this.cookiesSelectionnees.length === 1) {
                     this.cookiesSelectionnees[0].togglesSelection();
                     this.cookiesSelectionnees = [];
@@ -77,12 +100,14 @@ export default class Grille {
 
 
             img.ondragover = (event) => {
-                return false;
+                event.preventDefault()
             }
 
             img.ondrop = (event) => {
-                console.log("On drop une image");
-                console.log(event.target);
+                if (verbose) {
+                    console.log("On drop une image");
+                    console.log(event.target);
+                }
                 let endcookie = this.getCookieFromLC(event.target.dataset.ligne, event.target.dataset.colonne);
                 img.onclick(endcookie);
             }
@@ -123,94 +148,151 @@ export default class Grille {
         return tab;
     }
 
-    testAlignementVertical(colonne) {
-        let alignement = false;
-
-        // on parcourt les lignes de la colonne courante
-        for (let ligne = 0; ligne <= this.l - 3; ligne++) {
-            let cookie0 = this.tabcookies[ligne][colonne];
-            let cookie1 = this.tabcookies[ligne + 1][colonne];
-            let cookie2 = this.tabcookies[ligne + 2][colonne];
-            if (cookie0 === null || cookie1 === null || cookie2 === null) {
-                continue;
-            }
-            if ((cookie0.type === cookie1.type) && (cookie1.type === cookie2.type)) {
-                alignement = true;
-                //   on ajoute un encadrement autour des cookies aligné
-                cookie0.aligne()
-                cookie1.aligne()
-                cookie2.aligne()
-            }
-        }
-        return alignement;
+    getUniqueTab(tab) {
+        return tab.filter((cookie, index, self) => self.indexOf(cookie) === index);
     }
 
-    testAlignementHorizontal(ligne) {
-        let alignement = false;
 
-        // on parcourt les lignes de la colonne courante
-        for (let colonne = 0; colonne <= this.c - 3; colonne++) {
+    getCookiesAlignes(cookie, verbose = false) {
+        const ligne = cookie.ligne;
+        const colonne = cookie.colonne;
+        const typeCookie = cookie.type;
+        const cookiesAlignes = [];
 
-            let cookie0 = this.tabcookies[ligne][colonne];
-            let cookie1 = this.tabcookies[ligne][colonne + 1];
-            let cookie2 = this.tabcookies[ligne][colonne + 2];
+        const checkAndPush = (temp, nbAlignes) => {
+            if (nbAlignes >= 3) {
+                cookiesAlignes.push(...temp);
+            }
+        };
 
-            if (cookie0 === null || cookie1 === null || cookie2 === null) {
-                continue;
+        const analyzeDirection = (rowIncrement, colIncrement, direction, verbose = false) => {
+            let cookiesAlignesTemp = [];
+            let nbCookiesAlignes = 0;
+            let ligneAnalyse = ligne;
+            let colonneAnalyse = colonne;
+            if (verbose) {
+                console.log("ligneAnalyse : " + ligneAnalyse);
+                console.log("colonneAnalyse : " + colonneAnalyse);
+                console.log("ligne: " + ligne);
+                console.log("colonne: " + colonne);
+                console.log(cookie.ligne);
             }
 
-            if ((cookie0.type === cookie1.type) && (cookie1.type === cookie2.type)) {
-                alignement = true;
-                //   on ajoute un encadrement autour des cookies aligné
-                cookie0.aligne()
-                cookie1.aligne()
-                cookie2.aligne()
+            let cookieAnalyse = this.tabcookies[ligneAnalyse][colonneAnalyse];
+
+            while (ligneAnalyse >= 0 && ligneAnalyse < this.l && colonneAnalyse >= 0 && colonneAnalyse < this.c && cookieAnalyse.type === typeCookie) {
+                cookiesAlignesTemp.push(cookieAnalyse);
+                ligneAnalyse += rowIncrement;
+                colonneAnalyse += colIncrement;
+                if (ligneAnalyse < 0 || ligneAnalyse >= this.l || colonneAnalyse < 0 || colonneAnalyse >= this.c) {
+                    break;
+                }
+                cookieAnalyse = this.tabcookies[ligneAnalyse][colonneAnalyse];
+                nbCookiesAlignes++;
             }
-        }
-        return alignement;
+
+
+            if (cookieAnalyse.type === typeCookie) {
+                cookiesAlignesTemp.push(cookieAnalyse);
+                nbCookiesAlignes++;
+            }
+            if (verbose) {
+                console.log(`nombre de cookies alignés ${direction} : ${nbCookiesAlignes}`);
+                console.log(cookiesAlignesTemp);
+            }
+
+            checkAndPush(cookiesAlignesTemp, nbCookiesAlignes);
+        };
+
+        analyzeDirection(-1, 0, 'en haut', verbose);
+        analyzeDirection(1, 0, 'en bas', verbose);
+        analyzeDirection(0, -1, 'à gauche', verbose);
+        analyzeDirection(0, 1, 'à droite', verbose);
+
+        // Enlever les doublons
+        return this.getUniqueTab(cookiesAlignes);
     }
 
-    testAlignementVerticalAll() {
-        let alignement = false;
-        for (let c = 0; c < this.c; c++) {
-            console.log("test alignement vertical pour la colonne " + c);
-            alignement = alignement || this.testAlignementVertical(c);
-            console.log(this.testAlignementVertical(c))
-        }
-        return alignement;
 
-    }
-
-    testAlignementHorizontalAll() {
-        let alignement = false;
-        for (let l = 0; l < this.l; l++) {
-            console.log("test alignement horizontal pour la ligne " + l);
-            alignement = alignement || this.testAlignementHorizontal(l);
-            console.log(this.testAlignementHorizontal(l))
-        }
-        return alignement;
-    }
-
-    testAlignementAll() {
-        let alignementhorizontal = false;
-        let alignementvertical = false;
-        alignementhorizontal = this.testAlignementHorizontalAll();
-        alignementvertical = this.testAlignementVerticalAll();
-        return (alignementhorizontal || alignementvertical);
-    }
-
-    removeCookies() {
-        let score = document.querySelector("#scoreValeur");
+    getAllCookiesAlignes(verbose = false) {
+        let cookiesAlignes = [];
         for (let l = 0; l < this.l; l++) {
             for (let c = 0; c < this.c; c++) {
-                let cookie = this.tabcookies[l][c];
-                if (cookie !== null) {
-                    if (cookie.htmlImage.classList.contains("cookies-aligne")) {
-                        cookie.htmlImage.remove();
-                        this.tabcookies[l][c] = null;
-                        score.innerHTML++;
+                let cookieAnalyse = this.tabcookies[l][c];
+                cookiesAlignes.push(...this.getCookiesAlignes(cookieAnalyse, verbose));
+            }
+        }
 
+
+        return this.getUniqueTab(cookiesAlignes)
+    }
+
+    GetAllCookiesAlignesOfOneCookie(cookie, verbose = false) {
+        let cookiesAlignes = [];
+        cookiesAlignes.push(...this.getCookiesAlignes(cookie, verbose));
+        console.log("cookiesAlignes");
+        console.log(cookiesAlignes);
+        let AllCookiesAlignesOfOneCookie = [];
+        AllCookiesAlignesOfOneCookie.push(...cookiesAlignes)
+        for (let i = 0; i < cookiesAlignes.length; i++) {
+            AllCookiesAlignesOfOneCookie.push(...this.getCookiesAlignes(cookiesAlignes[i], verbose));
+        }
+        AllCookiesAlignesOfOneCookie = this.getUniqueTab(AllCookiesAlignesOfOneCookie);
+        return AllCookiesAlignesOfOneCookie;
+    }
+
+
+    scoreToGet(nombre_element_aligne) {
+        switch (nombre_element_aligne) {
+            case 3:
+                return 1;
+            case 4:
+                return 2;
+            case 5:
+                return 3;
+            case 6:
+                return 4;
+            default:
+                return 0;
+        }
+    }
+
+    attribuerScore(nombre_element_aligne) {
+        let score = document.querySelector("#scoreValeur");
+        let timer = document.querySelector("#tempsRestantValeur");
+        let newScore = parseInt(score.innerHTML) + this.scoreToGet(nombre_element_aligne);
+        score.innerHTML = newScore;
+        timer.innerHTML = parseInt(timer.innerHTML) + this.scoreToGet(nombre_element_aligne);
+    }
+
+
+    removeCookies() {
+
+        for (let l = 0; l < this.l; l++) {
+            for (let c = 0; c < this.c; c++) {
+
+                let cookieAnalyse = this.tabcookies[l][c];
+
+                if (cookieAnalyse === null) {
+                    continue;
+                }
+                let cookiesAlignes = this.getCookiesAlignes(cookieAnalyse);
+                let nombre_element_aligne = cookiesAlignes.length;
+                if (nombre_element_aligne >= 3) {
+                    let toutCookiesAlignes = [...cookiesAlignes];
+                    for (let i = 0; i < nombre_element_aligne; i++) {
+                        let cookie = cookiesAlignes[i];
+                        toutCookiesAlignes.push(...this.getCookiesAlignes(cookie));
                     }
+                    toutCookiesAlignes = this.getUniqueTab(toutCookiesAlignes);
+                    toutCookiesAlignes.forEach((cookie) => {
+                        cookie.htmlImage.remove();
+                        this.tabcookies[cookie.ligne][cookie.colonne] = null;
+                        this.attribuerScore(toutCookiesAlignes.length);
+                    });
+                    this.putGravity();
+                    this.refill();
+                    this.showCookies();
                 }
             }
         }
@@ -218,22 +300,26 @@ export default class Grille {
         soundManager.loadSound(assetsToLoadURLs.destroySound.url).then((buffer) => {
             soundManager.playSound(buffer);
         })
+
+        if(this.getAllCookiesAlignes().length>0){
+            this.removeCookies();
+        }
     }
 
     getCookieUp(ligne, colonne) {
         if (ligne === -1) {
             return null;
         }
-        if (this.tabcookies[ligne][colonne] === null) {
+
+        if (this.getCookieFromLC(ligne, colonne) === null) {
             this.getCookieUp(ligne - 1, colonne);
         }
         if (ligne + 1 < this.l) {
             if (this.tabcookies[ligne + 1][colonne] === null) {
-                this.tabcookies[ligne + 1][colonne] = this.tabcookies[ligne][colonne]
+                this.tabcookies[ligne + 1][colonne] = this.getCookieFromLC(ligne, colonne)
                 this.tabcookies[ligne][colonne] = null;
             }
         }
-
 
         return this.tabcookies[ligne][colonne];
     }
@@ -275,16 +361,75 @@ export default class Grille {
         }
     }
 
-    removeAlignement() {
 
-        while (this.testAlignementAll()) {
-            this.removeCookies();
-            this.putGravity();
-            this.refill();
+    checkIfSwapMakesAlignement(cookie1, cookie2) {
+        let cookiesAlignes = [];
+        Cookie.swapCookies(cookie1, cookie2,true);
+        cookiesAlignes = this.getAllCookiesAlignes();
+        Cookie.swapCookies(cookie1, cookie2);
+        let alignement = cookiesAlignes.length >= 3;
+        // console.log("checkIfSwapMakesAlignement pour " + cookie1 + " et " + cookie2 + " : " + alignement);
+        return alignement;
+    }
+
+    checkIfPossibleToPlay() {
+
+        //     on parcourt le tableau de cookies et on regarde si on peut aligner 3 cookies ou plus avec un swap sinon on dois refresh la grille
+        for (let l = 0; l < this.l; l++) {
+            for (let c = 0; c < this.c; c++) {
+                let cookieAnalyse = this.tabcookies[l][c];
+                if (cookieAnalyse === null) {
+                    continue;
+                }
+                if (l + 1 < this.l) {
+                    let cookieDown = this.tabcookies[l + 1][c];
+                    if (this.checkIfSwapMakesAlignement(cookieAnalyse, cookieDown)) {
+                        let tuple = [cookieAnalyse, cookieDown];
+                        this.cookiesSwapables.push(tuple);
+                    }
+                }
+                if (l - 1 >= 0) {
+                    let cookieUp = this.tabcookies[l - 1][c];
+                    if (this.checkIfSwapMakesAlignement(cookieAnalyse, cookieUp)) {
+                        let tuple = [cookieAnalyse, cookieUp];
+                        this.cookiesSwapables.push(tuple);
+                    }
+                }
+                if (c + 1 < this.c) {
+                    let cookieRight = this.tabcookies[l][c + 1];
+                    if (this.checkIfSwapMakesAlignement(cookieAnalyse, cookieRight)) {
+                        let tuple = [cookieAnalyse, cookieRight];
+                        this.cookiesSwapables.push(tuple);
+                    }
+                }
+                if (c - 1 >= 0) {
+                    let cookieLeft = this.tabcookies[l][c - 1];
+                    if (this.checkIfSwapMakesAlignement(cookieAnalyse, cookieLeft)) {
+                        let tuple = [cookieAnalyse, cookieLeft];
+                        this.cookiesSwapables.push(tuple);
+                    }
+                }
+            }
+
         }
-        this.showCookies();
+        this.cookiesSwapables = this.getUniqueTab(this.cookiesSwapables);
+
+
+        return this.cookiesSwapables;
+    }
+
+
+    showCookiesSwapables() {
+        let tupleAffiche = this.cookiesSwapables[Math.floor(Math.random() * this.cookiesSwapables.length)];
+        tupleAffiche.forEach((cookie) => {
+            cookie.addShiverState();
+            setTimeout(() => {
+                cookie.removeShiverState();
+            }, 1000)
+        })
 
     }
+
 
 }
 

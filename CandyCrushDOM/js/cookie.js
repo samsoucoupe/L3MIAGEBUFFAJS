@@ -1,6 +1,5 @@
 export default class Cookie {
-  ligne=0;
-  colone=0;
+
   type=0;
   htmlImage=undefined;
 
@@ -41,8 +40,6 @@ export default class Cookie {
 
     this.htmlImage = img;
 
-
-    // A FAIRE
   }
 
   selectionnee() {
@@ -69,7 +66,8 @@ export default class Cookie {
     }
   }
 
-  static swapCookies(c1, c2) {
+  static swapCookies(c1, c2, alerte = false) {
+
     // On échange leurs images et types.
     if (Cookie.distance(c1, c2) <2) {
       // On échange leurs images et types
@@ -81,15 +79,26 @@ export default class Cookie {
 
       c1.htmlImage.src = imageTemp;
       c1.type = typeTemp;
+    }else{
+      if (alerte) {
+        alert("Vous ne pouvez pas échanger ces deux cookies");
+      }
     }
     // et on les désélectionne
     c1.deselectionnee();
     c2.deselectionnee();
+    return Cookie.distance(c1, c2) <2;
   }
 
-  aligne(){
-    this.htmlImage.classList.add("cookies-aligne");
+  immobile(){
+    this.htmlImage.classList.add("cookies-immobile");
   }
+
+  deimmobile(){
+    this.htmlImage.classList.remove("cookies-immobile");
+  }
+
+
 
   /** renvoie la distance entre deux cookies */
   static distance(cookie1, cookie2) {
@@ -100,6 +109,13 @@ export default class Cookie {
 
     const distance = Math.abs(l1 - l2) + Math.abs(c1 - c2);
     return distance;
+  }
+
+  addShiverState(){
+    this.htmlImage.classList.add("cookies-shiver");
+  }
+  removeShiverState(){
+    this.htmlImage.classList.remove("cookies-shiver");
   }
 
 }
