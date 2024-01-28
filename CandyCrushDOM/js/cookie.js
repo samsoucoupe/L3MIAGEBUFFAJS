@@ -1,6 +1,5 @@
 export default class Cookie {
-  ligne=0;
-  colone=0;
+
   type=0;
   htmlImage=undefined;
 
@@ -67,7 +66,7 @@ export default class Cookie {
     }
   }
 
-  static swapCookies(c1, c2,verbose=false) {
+  static swapCookies(c1, c2, alerte = false) {
 
     // On échange leurs images et types.
     if (Cookie.distance(c1, c2) <2) {
@@ -81,7 +80,7 @@ export default class Cookie {
       c1.htmlImage.src = imageTemp;
       c1.type = typeTemp;
     }else{
-      if(verbose){
+      if (alerte) {
         alert("Vous ne pouvez pas échanger ces deux cookies");
       }
     }
