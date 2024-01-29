@@ -271,7 +271,7 @@ export default class Grille {
         for (let l = 0; l < this.l; l++) {
             for (let c = 0; c < this.c; c++) {
 
-                let cookieAnalyse = this.tabcookies[l][c];
+                let cookieAnalyse = this.getCookieFromLC(l,c);
 
                 if (cookieAnalyse === null) {
                     continue;
@@ -279,12 +279,15 @@ export default class Grille {
                 let cookiesAlignes = this.getCookiesAlignes(cookieAnalyse);
                 let nombre_element_aligne = cookiesAlignes.length;
                 if (nombre_element_aligne >= 3) {
-                    let toutCookiesAlignes = [...cookiesAlignes];
+                    let toutCookiesAlignes = [];
+                    toutCookiesAlignes.push(...cookiesAlignes);
                     for (let i = 0; i < nombre_element_aligne; i++) {
                         let cookie = cookiesAlignes[i];
                         toutCookiesAlignes.push(...this.getCookiesAlignes(cookie));
                     }
                     toutCookiesAlignes = this.getUniqueTab(toutCookiesAlignes);
+                    console.log("on remove");
+                    console.log(toutCookiesAlignes)
                     toutCookiesAlignes.forEach((cookie) => {
                         cookie.htmlImage.remove();
                         this.tabcookies[cookie.ligne][cookie.colonne] = null;
@@ -373,6 +376,7 @@ export default class Grille {
     }
 
     checkIfPossibleToPlay() {
+        this.cookiesSwapables= [];
 
         //     on parcourt le tableau de cookies et on regarde si on peut aligner 3 cookies ou plus avec un swap sinon on dois refresh la grille
         for (let l = 0; l < this.l; l++) {
@@ -420,6 +424,7 @@ export default class Grille {
 
 
     showCookiesSwapables() {
+        this.checkIfPossibleToPlay();
         let tupleAffiche = this.cookiesSwapables[Math.floor(Math.random() * this.cookiesSwapables.length)];
         tupleAffiche.forEach((cookie) => {
             cookie.addShiverState();
