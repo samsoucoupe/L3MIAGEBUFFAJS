@@ -1,6 +1,7 @@
 export default class Sound {
     constructor() {
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        this.source = null;
     }
 
     loadSound(url) {
@@ -11,9 +12,15 @@ export default class Sound {
     }
 
     playSound(buffer) {
-        const source = this.audioContext.createBufferSource();
-        source.buffer = buffer;
-        source.connect(this.audioContext.destination);
-        source.start(0);
+        this.source = this.audioContext.createBufferSource();
+        this.source.buffer = buffer;
+        this.source.connect(this.audioContext.destination);
+        this.source.start(0);
+    }
+
+    stopSound() {
+        if (this.source) {
+            this.source.stop();
+        }
     }
 }

@@ -1,15 +1,24 @@
 import Grille from "./grille.js";
+import {assetsToLoadURLs} from "./assets.js";
+import Sound from "./sound.js";
 
 // 1 On définisse une sorte de "programme principal"
 // le point d'entrée du code qui sera appelée dès que la
 // page ET SES RESSOURCES est chargée
-
-window.onload = init;
+let btnInitialiser = document.querySelector("#boutonStart");
+    btnInitialiser.addEventListener("click", () => {
+    init();
+    btnInitialiser.style.display = "none";
+});
 
 let grille;
 
 function init() {
     console.log("Page et ressources prêtes à l'emploi");
+    let soundManager = new Sound();
+    soundManager.loadSound(assetsToLoadURLs.backgroundMusic.url).then(buffer => {
+        soundManager.playSound(buffer);
+    })
     // appelée quand la page et ses ressources sont prêtes.
     // On dit aussi que le CandyCrushDOM est ready (en fait un peu plus...)
     let nombre_lignes = 9;
@@ -17,13 +26,8 @@ function init() {
     while (grille.getAllCookiesAlignes().length > 0) {
         grille.removeCookies();
     }
-    console.log("apres removeCookies");
-    grille.checkIfPossibleToPlay();
-    let btn = document.querySelector("#boutonaligner");
-    btn.onclick = () => {
-        grille.checkIfPossibleToPlay();
-    }
 
+    grille.checkIfPossibleToPlay();
 
     grille.showCookies();
     let score = document.querySelector("#scoreValeur");
@@ -38,6 +42,8 @@ function init() {
     function decompte() {
         tempsRestant.innerHTML--;
         if (tempsRestant.innerHTML <1) {
+            // Arreter la musique
+            soundManager.stopSound();
             alert("Fin de partie");
             clearInterval(interval);
             //   mettre le score en gros devant la grille et faire que la grille ne soit plus cliquable
@@ -52,7 +58,7 @@ function init() {
 
         }
 
-        if (tempsRestant.innerHTML % 5 === 0) {
+        if (tempsRestant.innerHTML % 10 === 0) {
             grille.showCookiesSwapables();
 
         }
@@ -70,6 +76,5 @@ function init() {
     }
 
     let interval = setInterval(decompte, 1000);
-
 
 }
