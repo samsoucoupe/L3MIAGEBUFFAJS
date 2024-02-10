@@ -58,7 +58,7 @@ export default class Grille {
                         let swapPossible = this.checkIfSwapMakesAlignement(this.cookiesSelectionnees[0], this.cookiesSelectionnees[1]);
 
                         if (!swapPossible) {
-                            soundManager.loadSound(assetsToLoadURLs.swapSound.url).then((buffer) => {
+                            soundManager.loadSound(assetsToLoadURLs.errorSound.url).then((buffer) => {
                                 soundManager.playSound(buffer);
                             })
 
