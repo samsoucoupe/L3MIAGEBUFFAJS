@@ -36,6 +36,7 @@
     grid-template-columns: repeat(9, 1fr);
     /* Pour contraindre la hauteur des lignes */
     grid-auto-rows: 80px;
+    overflow: hidden;
 }
 
 #grille div {
@@ -67,7 +68,15 @@
 .cookies-selected {
     transform: scale(1.2, 1.2);
     filter: drop-shadow(4px 4px 4px #222);
+}
 
+@keyframes fall {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(0); }
+}
+
+.cookies-fall {
+    animation: fall 0.5s forwards;
 }
 
 @keyframes shaking {
