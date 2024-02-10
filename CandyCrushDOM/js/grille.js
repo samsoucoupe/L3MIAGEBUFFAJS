@@ -36,6 +36,9 @@ export default class Grille {
                 return;
             }
             let img = cookie.htmlImage;
+            img.addEventListener("animationend", () => {
+                img.classList.remove("cookies-fall");
+            });
 
             img.onclick = (event) => {
                 if (verbose) {
@@ -359,6 +362,7 @@ export default class Grille {
             for (let c = 0; c < this.c; c++) {
                 if (this.tabcookies[l][c] === null) {
                     this.tabcookies[l][c] = new Cookie(Math.floor(Math.random() * 6), l, c);
+                    this.tabcookies[l][c].htmlImage.classList.add("cookies-fall");
                 }
             }
         }
