@@ -43,6 +43,7 @@ function init() {
 
     function gameOver() {
         alert("Fin de partie");
+        soundManager.stopSound();
         let btnInitialiser = document.querySelector("#boutonStart");
         btnInitialiser.style.display = "block";
         clearInterval(interval);

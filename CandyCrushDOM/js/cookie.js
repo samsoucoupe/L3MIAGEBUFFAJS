@@ -1,5 +1,3 @@
-import Sound from "./sound.js";
-import {assetsToLoadURLs} from "./assets.js";
 export default class Cookie {
 
   type=0;
