@@ -12,8 +12,12 @@ export default class Grille {
     constructor(l, c) {
         this.c = c;
         this.l = l;
-        this.tabcookies = this.remplirTableauDeCookies(6)
+
         this.cookiesSwapables = [];
+        this.level = 1;
+        this.maxCookies = 6;
+        this.numberOfCookiesForthatLevel = Math.min(this.maxCookies, Math.floor(this.level / 5) + 3);
+        this.tabcookies = this.remplirTableauDeCookies()
     }
 
 
@@ -69,11 +73,6 @@ export default class Grille {
                             return;
                         } else {
                             Cookie.swapCookies(this.cookiesSelectionnees[0], this.cookiesSelectionnees[1]);
-                            console.log("cookiesSelectionnees[0]");
-                            console.log(this.GetAllCookiesAlignesOfOneCookie(this.cookiesSelectionnees[0]));
-                            console.log("cookiesSelectionnees[1]");
-                            console.log(this.GetAllCookiesAlignesOfOneCookie(this.cookiesSelectionnees[1]));
-
 
                             this.cookiesSelectionnees = [];
                             soundManager.loadSound(assetsToLoadURLs.swapSound.url).then((buffer) => {
@@ -136,14 +135,14 @@ export default class Grille {
      *
      * On verra plus tard pour les améliorations...
      */
-    remplirTableauDeCookies(nbDeCookiesDifferents) {
+    remplirTableauDeCookies() {
+
+
         let tab = create2DArray(9);
         // remplir
         for (let l = 0; l < this.l; l++) {
             for (let c = 0; c < this.c; c++) {
-
-                const type = Math.floor(Math.random() * nbDeCookiesDifferents);
-                //console.log(type)
+                const type = Math.floor(Math.random() * this.numberOfCookiesForthatLevel);
                 tab[l][c] = new Cookie(type, l, c);
             }
         }
@@ -233,8 +232,6 @@ export default class Grille {
     GetAllCookiesAlignesOfOneCookie(cookie, verbose = false) {
         let cookiesAlignes = [];
         cookiesAlignes.push(...this.getCookiesAlignes(cookie, verbose));
-        console.log("cookiesAlignes");
-        console.log(cookiesAlignes);
         let AllCookiesAlignesOfOneCookie = [];
         AllCookiesAlignesOfOneCookie.push(...cookiesAlignes)
         for (let i = 0; i < cookiesAlignes.length; i++) {
@@ -263,9 +260,18 @@ export default class Grille {
     attribuerScore(nombre_element_aligne) {
         let score = document.querySelector("#scoreValeur");
         let timer = document.querySelector("#tempsRestantValeur");
+        let level = document.querySelector("#levelValeur");
         let newScore = parseInt(score.innerHTML) + this.scoreToGet(nombre_element_aligne);
         score.innerHTML = newScore;
-        timer.innerHTML = parseInt(timer.innerHTML) + this.scoreToGet(nombre_element_aligne);
+        timer.innerHTML = parseInt(timer.innerHTML) + 1;
+        if (newScore >= this.level * 50) {
+            this.level++;
+            level.innerHTML = this.level;
+            // this.clearGrille();
+            this.numberOfCookiesForthatLevel = Math.min(this.maxCookies, Math.floor(this.level / 5) + 3);
+            // this.refill();
+            // this.showCookies();
+        }
     }
 
 
@@ -289,8 +295,6 @@ export default class Grille {
                         toutCookiesAlignes.push(...this.getCookiesAlignes(cookie));
                     }
                     toutCookiesAlignes = this.getUniqueTab(toutCookiesAlignes);
-                    console.log("on remove");
-                    console.log(toutCookiesAlignes)
                     toutCookiesAlignes.forEach((cookie) => {
                         cookie.htmlImage.remove();
                         this.tabcookies[cookie.ligne][cookie.colonne] = null;
@@ -361,7 +365,8 @@ export default class Grille {
         for (let l = 0; l < this.l; l++) {
             for (let c = 0; c < this.c; c++) {
                 if (this.tabcookies[l][c] === null) {
-                    this.tabcookies[l][c] = new Cookie(Math.floor(Math.random() * 6), l, c);
+                    let type = Math.floor(Math.random() * this.numberOfCookiesForthatLevel);
+                    this.tabcookies[l][c] = new Cookie(type, l, c);
                     this.tabcookies[l][c].htmlImage.classList.add("cookies-fall");
                 }
             }
@@ -437,6 +442,18 @@ export default class Grille {
             }, 1000)
         })
 
+    }
+
+    clearGrille() {
+        for (let l = 0; l < this.l; l++) {
+            for (let c = 0; c < this.c; c++) {
+                let cookie = this.getCookieFromLC(l, c);
+                if (cookie !== null) {
+                    cookie.htmlImage.remove();
+                    this.tabcookies[l][c] = null;
+                }
+            }
+        }
     }
 
 
