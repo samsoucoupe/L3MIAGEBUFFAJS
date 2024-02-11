@@ -28,53 +28,48 @@ function init() {
     }
 
     grille.checkIfPossibleToPlay();
-
     grille.showCookies();
     let score = document.querySelector("#scoreValeur");
     score.innerHTML = 0;
     let tempsRestant = document.querySelector("#tempsRestantValeur");
-    tempsRestant.innerHTML = 60;
+    tempsRestant.innerHTML = 5;
+    let level = document.querySelector("#levelValeur");
+    level.innerHTML = 1;
+    let interval = setInterval(decompte, 1000);
 
 //   on decrement le temps de 1 seconde et on met a jour le temps dans la balise du html tempsRestantValeur
 //    on verifie si le temps est a 0 et si oui on affiche le message de fin de partie et on arrete le jeu
 
 
+    function gameOver() {
+        alert("Fin de partie");
+        let btnInitialiser = document.querySelector("#boutonStart");
+        btnInitialiser.style.display = "block";
+        clearInterval(interval);
+        grille.clearGrille();
+
+    }
+
+
     function decompte() {
         tempsRestant.innerHTML--;
-        if (tempsRestant.innerHTML <1) {
-            // Arreter la musique
-            soundManager.stopSound();
-            alert("Fin de partie");
-            clearInterval(interval);
-            //   mettre le score en gros devant la grille et faire que la grille ne soit plus cliquable
-
-            let score = document.querySelector("#scoreValeur");
-            score.style.fontSize = "xx-large";
-
-            let grille = document.querySelector("#grille");
-
-            grille.style.opacity = "0.5";
-            grille.style.pointerEvents = "none";
+        if (tempsRestant.innerHTML < 1) {
+            gameOver();
 
         }
 
         if (tempsRestant.innerHTML % 10 === 0) {
             grille.showCookiesSwapables();
 
-        }
 
-        if (tempsRestant.innerHTML <10) {
-            tempsRestant.style.color = "red";
-        }
-        else if (tempsRestant.innerHTML <20) {
-            tempsRestant.style.color = "orange";
-        }
-        else if (tempsRestant.innerHTML <30) {
-            tempsRestant.style.color = "yellow";
+            if (tempsRestant.innerHTML < 10) {
+                tempsRestant.style.color = "red";
+            } else if (tempsRestant.innerHTML < 20) {
+                tempsRestant.style.color = "orange";
+            } else if (tempsRestant.innerHTML < 30) {
+                tempsRestant.style.color = "yellow";
+            }
         }
 
     }
-
-    let interval = setInterval(decompte, 1000);
-
 }
