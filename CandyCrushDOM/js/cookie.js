@@ -66,10 +66,15 @@ export default class Cookie {
     }
   }
 
-  static swapCookies(c1, c2, alerte = false) {
+  static swapCookies(c1, c2, animation, alerte = false) {
 
     // On échange leurs images et types.
     if (Cookie.distance(c1, c2) <2) {
+        if (animation) {
+      c1.htmlImage.classList.add('swap-animation');
+      c2.htmlImage.classList.add('swap-animation');
+    }
+
       // On échange leurs images et types
       const imageTemp = c2.htmlImage.src;
       const typeTemp = c2.type;
@@ -79,6 +84,14 @@ export default class Cookie {
 
       c1.htmlImage.src = imageTemp;
       c1.type = typeTemp;
+
+    if (animation){
+      setTimeout(() => {
+        c1.htmlImage.classList.remove('swap-animation');
+        c2.htmlImage.classList.remove('swap-animation');
+      }, 300);}
+
+
     }else{
       if (alerte) {
         alert("Vous ne pouvez pas échanger ces deux cookies");
