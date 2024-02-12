@@ -32,7 +32,7 @@ function init() {
     let score = document.querySelector("#scoreValeur");
     score.innerHTML = 0;
     let tempsRestant = document.querySelector("#tempsRestantValeur");
-    tempsRestant.innerHTML = 5;
+    tempsRestant.innerHTML = 25;
     let level = document.querySelector("#levelValeur");
     level.innerHTML = 1;
     let interval = setInterval(decompte, 1000);
@@ -42,8 +42,8 @@ function init() {
 
 
     function gameOver() {
-        alert("Fin de partie");
         soundManager.stopSound();
+        alert("Fin de partie");
         let btnInitialiser = document.querySelector("#boutonStart");
         btnInitialiser.style.display = "block";
         clearInterval(interval);
@@ -56,7 +56,6 @@ function init() {
         tempsRestant.innerHTML--;
         if (tempsRestant.innerHTML < 1) {
             gameOver();
-
         }
 
         if (tempsRestant.innerHTML % 10 === 0) {
