@@ -260,7 +260,7 @@ export default class Grille {
         if (newScore >= this.nextScoreTolvlUp) {
             this.level++;
             level.innerHTML = this.level;
-            timer.innerHTML = 25;
+            timer.innerHTML = 25+this.level*5;
             this.nextScoreTolvlUp = this.nextScoreTolvlUp + this.level * 100;
             scoreNextLevelValeur.innerHTML = this.nextScoreTolvlUp;
             this.numberOfCookiesForthatLevel = Math.min(this.maxCookies, Math.floor(this.level / 5) + 3);
