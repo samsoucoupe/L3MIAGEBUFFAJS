@@ -13,7 +13,7 @@ C'est un travail pratique réalisé dans le cadre du cours "Analyse des besoins 
 - **Alignement :** Dans notre projet, le système de vérification d'alignement de bonbons fonctionne en parcourant la grille de jeu pour détecter des séquences consécutives de trois bonbons identiques dans les lignes et les colonnes.
 Initialement prévu que dans les colonnes, le système a été modifié après conseil de Mr Quere.
 
-- **Gestion des niveaux :** Le jeu propose une progression de niveau, avec une augmentation de la difficulté à mesure que le joueur progresse. Un niveau est atteint tout les 100 points et chaque niveau réinitialise le timer.
+- **Gestion des niveaux :** Le jeu propose une progression de niveau, avec une augmentation de la difficulté à mesure que le joueur progresse. Un niveau est atteint dès que le score dépasse ou atteint le seuil requis pour passer au niveau suivant, lequel est calculé en ajoutant 100 points multipliés par le niveau actuel au seuil précédent. Chaque passage de niveau réinitialise également le timer.
 
 - **Gestion du temps :** Une minuterie est intégrée au jeu, offrant une contrainte de temps pour chaque niveau. Le jeu se termine si le temps imparti est écoulé.
 
