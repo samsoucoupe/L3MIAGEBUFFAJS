@@ -35,6 +35,9 @@ function init() {
     tempsRestant.innerHTML = 25;
     let level = document.querySelector("#levelValeur");
     level.innerHTML = 1;
+    let scoreNextLevelValeur = document.querySelector("#scoreNextLevelValeur");
+    scoreNextLevelValeur.innerHTML = grille.nextScoreTolvlUp;
+
     let interval = setInterval(decompte, 1000);
 
 //   on decrement le temps de 1 seconde et on met a jour le temps dans la balise du html tempsRestantValeur
@@ -48,6 +51,7 @@ function init() {
         btnInitialiser.style.display = "block";
         clearInterval(interval);
         grille.clearGrille();
+        tempsRestant.style.color = "rgb(133, 47, 47)";
 
     }
 
@@ -61,12 +65,11 @@ function init() {
         if (tempsRestant.innerHTML % 10 === 0) {
             grille.showCookiesSwapables();
 
-
-            if (tempsRestant.innerHTML < 10) {
+            if (tempsRestant.innerHTML < 5) {
                 tempsRestant.style.color = "red";
-            } else if (tempsRestant.innerHTML < 20) {
+            } else if (tempsRestant.innerHTML < 10) {
                 tempsRestant.style.color = "orange";
-            } else if (tempsRestant.innerHTML < 30) {
+            } else if (tempsRestant.innerHTML < 15) {
                 tempsRestant.style.color = "yellow";
             }
         }

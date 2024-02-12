@@ -12,7 +12,7 @@ export default class Grille {
     constructor(l, c) {
         this.c = c;
         this.l = l;
-
+        this.nextScoreTolvlUp = 100;
         this.cookiesSwapables = [];
         this.level = 1;
         this.maxCookies = 6;
@@ -261,18 +261,19 @@ export default class Grille {
         let score = document.querySelector("#scoreValeur");
         let timer = document.querySelector("#tempsRestantValeur");
         let level = document.querySelector("#levelValeur");
+        let scoreNextLevelValeur = document.querySelector("#scoreNextLevelValeur");
         let newScore = parseInt(score.innerHTML) + this.scoreToGet(nombre_element_aligne);
         score.innerHTML = newScore;
-        timer.innerHTML = parseInt(timer.innerHTML) + 1;
-        if (newScore >= this.level * 50) {
+        // on augmente le niveau de maniere exponentielle c'est a dire premier lvl a 50 puis le lvl suivant a 150 et ains de suite comme dans le vrai candy crush en suivant une logique de fibonacci
+        if (newScore >= this.nextScoreTolvlUp) {
             this.level++;
             level.innerHTML = this.level;
             timer.innerHTML = 25;
-            // this.clearGrille();
+            this.nextScoreTolvlUp = this.nextScoreTolvlUp + this.level * 100;
+            scoreNextLevelValeur.innerHTML = this.nextScoreTolvlUp;
             this.numberOfCookiesForthatLevel = Math.min(this.maxCookies, Math.floor(this.level / 5) + 3);
-            // this.refill();
-            // this.showCookies();
         }
+
     }
 
 
@@ -381,7 +382,6 @@ export default class Grille {
         cookiesAlignes = this.getAllCookiesAlignes();
         Cookie.swapCookies(cookie1, cookie2);
         let alignement = cookiesAlignes.length >= 3;
-        // console.log("checkIfSwapMakesAlignement pour " + cookie1 + " et " + cookie2 + " : " + alignement);
         return alignement;
     }
 
