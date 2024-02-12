@@ -18,6 +18,7 @@ export default class Grille {
         this.maxCookies = 6;
         this.numberOfCookiesForthatLevel = Math.min(this.maxCookies, Math.floor(this.level / 5) + 3);
         this.tabcookies = this.remplirTableauDeCookies()
+        this.state = "normal";
     }
 
 
@@ -72,7 +73,7 @@ export default class Grille {
                             this.cookiesSelectionnees = [];
                             return;
                         } else {
-                            Cookie.swapCookies(this.cookiesSelectionnees[0], this.cookiesSelectionnees[1]);
+                            Cookie.swapCookies(this.cookiesSelectionnees[0], this.cookiesSelectionnees[1], true, true);
 
                             this.cookiesSelectionnees = [];
                             soundManager.loadSound(assetsToLoadURLs.swapSound.url).then((buffer) => {
@@ -83,7 +84,9 @@ export default class Grille {
 
                         }
                     }
-                    this.removeCookies();
+                    setTimeout(() => {
+                        this.removeCookies();
+                    }, 500);
                 }
 
 
@@ -123,18 +126,7 @@ export default class Grille {
         return this.tabcookies[ligne][colonne];
     }
 
-    /**
-     * Initialisation du niveau de départ. Le paramètre est le nombre de cookies différents
-     * dans la grille. 4 types (4 couleurs) = facile de trouver des possibilités de faire
-     * des groupes de 3. 5 = niveau moyen, 6 = niveau difficile
-     *
-     * Améliorations : 1) s'assurer que dans la grille générée il n'y a pas déjà de groupes
-     * de trois. 2) S'assurer qu'il y a au moins 1 possibilité de faire un groupe de 3 sinon
-     * on a perdu d'entrée. 3) réfléchir à des stratégies pour générer des niveaux plus ou moins
-     * difficiles.
-     *
-     * On verra plus tard pour les améliorations...
-     */
+
     remplirTableauDeCookies() {
 
 
@@ -279,40 +271,22 @@ export default class Grille {
 
     removeCookies() {
 
-        for (let l = 0; l < this.l; l++) {
-            for (let c = 0; c < this.c; c++) {
 
-                let cookieAnalyse = this.getCookieFromLC(l,c);
-
-                if (cookieAnalyse === null) {
-                    continue;
-                }
-                let cookiesAlignes = this.getCookiesAlignes(cookieAnalyse);
-                let nombre_element_aligne = cookiesAlignes.length;
-                if (nombre_element_aligne >= 3) {
-                    let toutCookiesAlignes = [];
-                    toutCookiesAlignes.push(...cookiesAlignes);
-                    for (let i = 0; i < nombre_element_aligne; i++) {
-                        let cookie = cookiesAlignes[i];
-                        toutCookiesAlignes.push(...this.getCookiesAlignes(cookie));
-                    }
-                    toutCookiesAlignes = this.getUniqueTab(toutCookiesAlignes);
-                    toutCookiesAlignes.forEach((cookie) => {
-                        cookie.htmlImage.remove();
-                        this.tabcookies[cookie.ligne][cookie.colonne] = null;
-                        this.attribuerScore(toutCookiesAlignes.length);
-                    });
-                    this.putGravity();
-                    this.refill();
-                    this.showCookies();
-                }
-            }
+        let cookiesAlignes = this.getAllCookiesAlignes();
+        cookiesAlignes.forEach((cookie) => {
+            cookie.htmlImage.remove();
+            this.tabcookies[cookie.ligne][cookie.colonne] = null;
+            this.attribuerScore(cookiesAlignes.length);
         }
+        );
+         this.putGravity();
+        this.refill();
+        this.showCookies();
+
         let soundManager = new Sound();
         soundManager.loadSound(assetsToLoadURLs.destroySound.url).then((buffer) => {
             soundManager.playSound(buffer);
         })
-
         if(this.getAllCookiesAlignes().length>0){
             this.removeCookies();
         }
@@ -378,9 +352,9 @@ export default class Grille {
 
     checkIfSwapMakesAlignement(cookie1, cookie2) {
         let cookiesAlignes = [];
-        Cookie.swapCookies(cookie1, cookie2,true);
+        Cookie.swapCookies(cookie1, cookie2,false,true);
         cookiesAlignes = this.getAllCookiesAlignes();
-        Cookie.swapCookies(cookie1, cookie2);
+        Cookie.swapCookies(cookie1, cookie2,false,false);
         let alignement = cookiesAlignes.length >= 3;
         return alignement;
     }
@@ -435,6 +409,16 @@ export default class Grille {
 
     showCookiesSwapables() {
         this.checkIfPossibleToPlay();
+        if (this.state === "gameOver") {
+            return;
+        }
+
+        if (this.cookiesSwapables.length === 0 ) {
+            this.clearGrille();
+            this.tabcookies = this.remplirTableauDeCookies();
+            this.showCookies();
+            this.showCookiesSwapables();
+        }
         let tupleAffiche = this.cookiesSwapables[Math.floor(Math.random() * this.cookiesSwapables.length)];
         tupleAffiche.forEach((cookie) => {
             cookie.addShiverState();
