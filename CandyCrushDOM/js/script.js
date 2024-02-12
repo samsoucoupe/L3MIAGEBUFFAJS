@@ -6,7 +6,7 @@ import Sound from "./sound.js";
 // le point d'entrée du code qui sera appelée dès que la
 // page ET SES RESSOURCES est chargée
 let btnInitialiser = document.querySelector("#boutonStart");
-    btnInitialiser.addEventListener("click", () => {
+btnInitialiser.addEventListener("click", () => {
     init();
     btnInitialiser.style.display = "none";
 });
@@ -52,6 +52,8 @@ function init() {
         clearInterval(interval);
         grille.clearGrille();
         tempsRestant.style.color = "rgb(133, 47, 47)";
+        tempsRestant.innerHTML = 25;
+        grille.state = "gameOver";
 
     }
 
@@ -64,14 +66,15 @@ function init() {
 
         if (tempsRestant.innerHTML % 10 === 0) {
             grille.showCookiesSwapables();
-
-            if (tempsRestant.innerHTML < 5) {
-                tempsRestant.style.color = "red";
-            } else if (tempsRestant.innerHTML < 10) {
-                tempsRestant.style.color = "orange";
-            } else if (tempsRestant.innerHTML < 15) {
-                tempsRestant.style.color = "yellow";
-            }
+        }
+        if (tempsRestant.innerHTML < 5) {
+            tempsRestant.style.color = "red";
+        } else if (tempsRestant.innerHTML < 10) {
+            tempsRestant.style.color = "orange";
+        } else if (tempsRestant.innerHTML < 15) {
+            tempsRestant.style.color = "yellow";
+        } else {
+            tempsRestant.style.color = "rgb(133, 47, 47)";
         }
 
     }
