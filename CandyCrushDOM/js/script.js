@@ -54,7 +54,10 @@ function init() {
         tempsRestant.style.color = "rgb(133, 47, 47)";
         tempsRestant.innerHTML = 25;
         grille.state = "gameOver";
-        grille.level=1;
+        grille.level = 1;
+        level.innerHTML = 1;
+        score.innerHTML = 0;
+        scoreNextLevelValeur.innerHTML = 100;
         grille.nextScoreTolvlUp=100;
     }
 
