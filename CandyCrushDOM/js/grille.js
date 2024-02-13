@@ -439,6 +439,9 @@ export default class Grille {
                 }
             }
         }
+        if (this.state === "gameOver") {
+            this.numberOfCookiesForthatLevel = Math.min(this.maxCookies, Math.floor(this.level / 5) + 3);
+        }
     }
 
 

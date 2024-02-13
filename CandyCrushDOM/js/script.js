@@ -50,7 +50,6 @@ function init() {
         let btnInitialiser = document.querySelector("#boutonStart");
         btnInitialiser.style.display = "block";
         clearInterval(interval);
-        grille.clearGrille();
         tempsRestant.style.color = "rgb(133, 47, 47)";
         tempsRestant.innerHTML = 25;
         grille.state = "gameOver";
@@ -59,6 +58,7 @@ function init() {
         score.innerHTML = 0;
         scoreNextLevelValeur.innerHTML = 100;
         grille.nextScoreTolvlUp=100;
+        grille.clearGrille();
     }
 
 
