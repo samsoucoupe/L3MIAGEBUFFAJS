@@ -34,7 +34,7 @@ function init() {
     let tempsRestant = document.querySelector("#tempsRestantValeur");
     tempsRestant.innerHTML = 25;
     let level = document.querySelector("#levelValeur");
-    level.innerHTML = 1;
+    level.innerHTML = grille.level;
     let scoreNextLevelValeur = document.querySelector("#scoreNextLevelValeur");
     scoreNextLevelValeur.innerHTML = grille.nextScoreTolvlUp;
 
@@ -54,7 +54,8 @@ function init() {
         tempsRestant.style.color = "rgb(133, 47, 47)";
         tempsRestant.innerHTML = 25;
         grille.state = "gameOver";
-
+        grille.level=1;
+        grille.nextScoreTolvlUp=100;
     }
 
 
